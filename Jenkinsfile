@@ -24,9 +24,11 @@ pipeline {
                 }
             }
         }
-        stage('Test') { 
+        stage('Install Dependencies') { 
             steps {
-                echo "Testing" 
+                sh """
+                    npm install
+                """
             }
         }
         stage('Deploy') { 
