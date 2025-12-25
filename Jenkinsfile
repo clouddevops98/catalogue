@@ -61,7 +61,7 @@ pipeline {
         failure {
             echo 'I will run if sucess'
         aborted {
-             echo 'pipeline is aborted'
+            echo 'pipeline is aborted'
         }
         }
     }
