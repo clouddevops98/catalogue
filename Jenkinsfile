@@ -29,9 +29,35 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                script {
+                    sh """
+                        npm install
+                    """
+                }
             }
         }
+        stage('Unit Test') {
+            steps {
+                script {
+                    sh """
+                        npm install
+                    """
+                }
+            }
+        }
+        stage('Sonar Scan'){
+            environment {
+                def scannerHome = tool 'sonar-8.0'
+            }
+            steps {
+                script{
+                    withSonarQubeEnv('sonar-server') {
+                        sh  "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
+            }
+        }
+        
 
         stage('Build & Push Image') {
             steps {
