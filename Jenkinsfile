@@ -42,10 +42,12 @@ pipeline {
                     docker build ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com/${PROJECT}/${COMPONMENT}:${appVersion}
                     docker images
                     docker push ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com/${PROJECT}/${COMPONMENT}:${appVersion}
-                """
+                    """
+                    }
                 }
             }
         }
+
     post{
         always{
             echo 'I will always say Hello again!'
