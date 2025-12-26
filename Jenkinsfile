@@ -1,74 +1,68 @@
 pipeline {
-    // These are pre-build sections.
     agent {
-        node {
-            label 'AGENT-1'
-        }
+        label 'AGENT-1'
     }
+
     environment {
         COURSE = "Jenkins"
-        appVersion = ""
         ACC_ID = "930832106480"
         PROJECT = "roboshop"
-        COMPONMENT = "catalogue"
-    } 
+        COMPONENT = "catalogue"
+        appVersion = ""
+    }
+
     options {
         timeout(time: 10, unit: 'MINUTES')
         disableConcurrentBuilds()
     }
- // This is build section.
+
     stages {
         stage('Read Version') {
             steps {
-                script{
+                script {
                     def packageJSON = readJSON file: 'package.json'
                     appVersion = packageJSON.version
-                    echo "app version: ${appVersion}"
+                    echo "App Version: ${appVersion}"
                 }
             }
         }
-        stage('Install Dependencies') { 
+
+        stage('Install Dependencies') {
             steps {
-                script{
+                sh 'npm install'
+            }
+        }
+
+        stage('Build & Push Image') {
+            steps {
+                withAWS(region: 'us-east-1', credentials: 'aws-creds') {
                     sh """
-                        npm install
+                        aws ecr get-login-password --region us-east-1 | \
+                        docker login --username AWS --password-stdin ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com
+
+                        docker build -t ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com/${PROJECT}/${COMPONENT}:${appVersion} .
+
+                        docker push ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com/${PROJECT}/${COMPONENT}:${appVersion}
                     """
                 }
             }
         }
-        stage('BUILD Image') { 
-            steps {
-                script{
-                    withAWS(region:'us-east-1',credentials:'aws-creds') {
-                        sh """
-                            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com
-                            docker build ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com/${PROJECT}/${COMPONMENT}:${appVersion}
-                            docker images
-                            docker push ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com/${PROJECT}/${COMPONMENT}:${appVersion}
-                        """	
-                    }
-                }
-            }
-        }
-
-    
-
     }
 
-
-    post{
-        always{
-            echo 'I will always say Hello again!'
+    post {
+        always {
+            echo 'Pipeline finished'
             cleanWs()
         }
         success {
-            echo 'I will run if sucess'
+            echo 'Pipeline succeeded'
         }
         failure {
-            echo 'I will run if sucess'
-        aborted {
-            echo 'pipeline is aborted'
+            echo 'Pipeline failed'
         }
-        
+        aborted {
+            echo 'Pipeline aborted'
+        }
     }
 }
+
