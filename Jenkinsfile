@@ -1,8 +1,10 @@
 pipeline {
+    // These are pre-build sections
     agent {
-        label 'AGENT-1'
+        node {
+            label 'AGENT-1'
+        }
     }
-
     environment {
         COURSE = "Jenkins"
         ACC_ID = "930832106480"
@@ -10,12 +12,10 @@ pipeline {
         COMPONENT = "catalogue"
         appVersion = ""
     }
-
     options {
         timeout(time: 10, unit: 'MINUTES')
         disableConcurrentBuilds()
     }
-
     stages {
         stage('Read Version') {
             steps {
