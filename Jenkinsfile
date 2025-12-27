@@ -45,18 +45,18 @@ pipeline {
                 }
             }
         }
-        // stage('Sonar Scan'){
-        //     environment {
-        //         def scannerHome = tool 'sonar-8.0'
-        //     }
-        //     steps{
-        //         script{
-        //              withSonarQubeEnv('sonar-server') {
-        //                 sh  "${scannerHome}/bin/sonar-scanner"
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Sonar Scan'){
+            environment {
+                def scannerHome = tool 'sonar-8.0'
+            }
+            steps{
+                script{
+                     withSonarQubeEnv('sonar-server') {
+                        sh  "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
+            }
+        }
         stage('Build & Push Image') {
             steps {
                 withAWS(region: 'us-east-1', credentials: 'aws-creds') {
